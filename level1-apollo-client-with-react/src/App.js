@@ -1,19 +1,13 @@
 import React from 'react';
-import ApolloClient, {gql} from 'apollo-boost';
+import ApolloClient from 'apollo-boost';
 import { ApolloProvider } from '@apollo/react-hooks';
-import { Query } from 'react-apollo';
-import './App.css';
+import { BrowserRouter as Router, Route, Switch, Link } from 'react-router-dom';
 
-const POSTS_QUERY = gql `
-  {
-    posts(orderBy: createdAt_DESC) {
-      id
-      title
-      postDate
-      body
-    }
-  }
-`;
+
+import Post from './Posts/Post';
+import Posts from './Posts/Posts';
+import NewPost from './Posts/NewPost';
+
 
 const client = new ApolloClient({
   uri: 'https://api-useast.graphcms.com/v1/ck34ue09m0xxn01gq81jiekzi/master'
@@ -24,20 +18,17 @@ const client = new ApolloClient({
 function App() {
   return (
     <ApolloProvider client={client}>
-      <div className="App">
-        <h1>Hello World</h1>
-        <Query query={POSTS_QUERY}>
-          {({loading, data}) => {
-            if(loading) return 'Loading...'
-            const { posts } = data;
-            return posts.map(post => (
-              <div key={post.id}>
-                <h1>{post.title}</h1>
-              </div>
-            ))
-          }}
-        </Query>
-      </div>
+      <Router>
+        <div className="App">
+          <Link to={'/post/new'}>Add New Post</Link>
+
+          <Switch>
+            <Route exact path="/" component={Posts} />
+            <Route exact path="/post/new" component={NewPost} />
+            <Route path="/post/:id" component={Post} />
+          </Switch>
+        </div>
+      </Router>
     </ApolloProvider>
   );
 }
